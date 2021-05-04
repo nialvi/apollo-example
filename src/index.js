@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
@@ -15,23 +15,11 @@ const apolloClient = new ApolloClient({
   connectToDevTools: true,
 });
 
-apolloClient
-  .query({
-    query: gql`
-      {
-        todos {
-          id
-          task
-          complete
-        }
-      }
-    `,
-  })
-  .then((result) => console.log(result));
-
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <ApolloProvider client={apolloClient}>
+      <App />
+    </ApolloProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );
