@@ -1,9 +1,9 @@
+#import "./Todo.fragment.graphql"
+
 query EditTodo($id: ID!, $text: String!) {
   editTodo(where: { id: $id }, fields: { task: $text }) {
     node {
-      complete
-      id
-      task
+      ...TodoBaseData
     }
   }
 }
