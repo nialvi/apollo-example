@@ -1,13 +1,29 @@
 import { useState } from "react";
+import produce from "immer";
 import { useQuery, useMutation } from "@apollo/client";
-import ListTodos from "./graphql/ListTodos.query.graphql";
+import ListTodosQuery from "./graphql/ListTodos.query.graphql";
 import AddTodoMutation from "./graphql/AddTodo.mutation.graphql";
 import EditTodoMutation from "./graphql/EditTodo.mutation.graphql";
 import "./App.css";
 
 function App() {
-  const { loading, data: { todos } = {} } = useQuery(ListTodos);
-  const [addTodo] = useMutation(AddTodoMutation);
+  const { loading, data: { todos } = {} } = useQuery(ListTodosQuery);
+  const [addTodo] = useMutation(AddTodoMutation, {
+    update(cache, result) {
+      const listTodosQueryResult = cache.readQuery({
+        query: ListTodosQuery,
+      });
+
+      const newListTodosQueryResult = produce(listTodosQueryResult, (draft) => {
+        draft.todos.push(result.data.newTodoText.node);
+      });
+
+      cache.writeQuery({
+        query: ListTodosQuery,
+        data: newListTodosQueryResult,
+      });
+    },
+  });
   const [editTodo] = useMutation(EditTodoMutation);
   const [newTodoText, setTodoText] = useState("");
 
