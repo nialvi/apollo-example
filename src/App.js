@@ -62,11 +62,25 @@ function App() {
             {t.id} {t.task} {t.complete}
             <button
               onClick={() => {
+                const text = `[MODIFIED ${Math.random()}] ${t.task}`;
+
+                const optimisticResponse = {
+                  editTodo: {
+                    __typename: "TodoResponse",
+                    node: {
+                      __typename: "Todo",
+                      id: t.id,
+                      task: `Optimistic ${t.task}`,
+                    },
+                  },
+                };
+
                 editTodo({
                   variables: {
                     id: t.id,
-                    text: `[MODIFIED ${Math.random()}] ${t.task}`,
+                    text,
                   },
+                  optimisticResponse,
                 });
               }}
             >
@@ -96,7 +110,18 @@ function App() {
         onClick={() => {
           // brr inline handler
           // all we know that don't need to do this
-          addTodo({ text: newTodoText });
+          addTodo({
+            variables: { text: newTodoText },
+            optimisticResponse: (vars) => ({
+              newTodo: {
+                node: {
+                  complete: false,
+                  id: `Optimistic ${Math.random()}`,
+                  task: `Optimistic ${vars.text}`,
+                },
+              },
+            }),
+          });
         }}
       >
         add todo
