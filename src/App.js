@@ -1,10 +1,14 @@
 import { useState } from "react";
 import produce from "immer";
-import { useQuery, useMutation } from "@apollo/client";
+
 import ListTodosQuery from "./graphql/ListTodos.query.graphql";
 import AddTodoMutation from "./graphql/AddTodo.mutation.graphql";
 import EditTodoMutation from "./graphql/EditTodo.mutation.graphql";
 import RemoveTodoMutation from "./graphql/RemoveTodo.mutation.graphql";
+import NewTodoSubscription from "./graphql/NewTodo.subscription.graphql";
+
+import { useQuery, useMutation, useSubscription } from "@apollo/client";
+
 import "./App.css";
 
 function App() {
@@ -37,6 +41,11 @@ function App() {
           id,
         }),
       });
+    },
+  });
+  useSubscription(NewTodoSubscription, {
+    onSubscriptionData(data) {
+      console.log(data);
     },
   });
 

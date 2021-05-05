@@ -1,0 +1,10 @@
+subscription OnNewTodo {
+  todo(mutation: CREATE) {
+    node {
+      __typename
+      id
+      complete
+      task
+    }
+  }
+}
