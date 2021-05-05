@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import ListTodos from "./graphql/ListTodos.query.graphql";
 import AddTodoMutation from "./graphql/AddTodo.mutation.graphql";
+import EditTodoMutation from "./graphql/EditTodo.mutation.graphql";
 import "./App.css";
 
 function App() {
   const { loading, data: { todos } = {} } = useQuery(ListTodos);
   const [addTodo] = useMutation(AddTodoMutation);
+  const [editTodo] = useMutation(EditTodoMutation);
   const [newTodoText, setTodoText] = useState("");
 
   if (loading) {
@@ -19,6 +21,18 @@ function App() {
         {todos.map((t) => (
           <li key={t.id}>
             {t.id} {t.task} {t.complete}
+            <button
+              onClick={() => {
+                editTodo({
+                  variables: {
+                    id: t.id,
+                    text: `[MODIFIED ${Math.random()}] ${t.task}`,
+                  },
+                });
+              }}
+            >
+              add modified
+            </button>
           </li>
         ))}
       </ul>
