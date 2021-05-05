@@ -1,0 +1,3 @@
+query RemoveTodo($id: ID!) {
+  removeTodo(where: { id: $id })
+}

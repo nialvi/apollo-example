@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import ListTodosQuery from "./graphql/ListTodos.query.graphql";
 import AddTodoMutation from "./graphql/AddTodo.mutation.graphql";
 import EditTodoMutation from "./graphql/EditTodo.mutation.graphql";
+import RemoveTodoMutation from "./graphql/RemoveTodo.mutation.graphql";
 import "./App.css";
 
 function App() {
@@ -25,6 +26,28 @@ function App() {
     },
   });
   const [editTodo] = useMutation(EditTodoMutation);
+  const [removeTodo] = useMutation(RemoveTodoMutation, {
+    update(cache, result) {
+      const [id] = result.data.removeTodo;
+
+      // delete from cache the todo by id
+      cache.evict({
+        id: cache.identify({
+          __typename: "Todo",
+          id,
+        }),
+      });
+    },
+  });
+
+  // or we can refetch data
+  // const [removeTodo] = useMutation(RemoveTodoMutation, {
+  //   refetchQueries: [
+  //     {
+  //       query: ListTodosQuery,
+  //     },
+  //   ],
+  // });
   const [newTodoText, setTodoText] = useState("");
 
   if (loading) {
@@ -48,6 +71,17 @@ function App() {
               }}
             >
               add modified
+            </button>
+            <button
+              onClick={() => {
+                removeTodo({
+                  variables: {
+                    id: t.id,
+                  },
+                });
+              }}
+            >
+              remove
             </button>
           </li>
         ))}
