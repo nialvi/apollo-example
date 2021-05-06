@@ -30,34 +30,37 @@ function App() {
     },
   });
   const [editTodo] = useMutation(EditTodoMutation);
-  const [removeTodo] = useMutation(RemoveTodoMutation, {
-    update(cache, result) {
-      const [id] = result.data.removeTodo;
+  // const [removeTodo] = useMutation(RemoveTodoMutation, {
+  //   update(cache, result) {
+  //     const [id] = result.data.removeTodo;
 
-      // delete from cache the todo by id
-      cache.evict({
-        id: cache.identify({
-          __typename: "Todo",
-          id,
-        }),
-      });
+  //     // delete from cache the todo by id
+  //     cache.evict({
+  //       id: cache.identify({
+  //         __typename: "Todo",
+  //         id,
+  //       }),
+  //     });
+  //   },
+  // });
+
+  // or we can refetch data
+  const [removeTodo] = useMutation(RemoveTodoMutation, {
+    optimisticResponse: (vars) => ({
+      removeTodo: [vars.id],
+    }),
+    update(cache, result) {
+      console.log(result);
     },
   });
+
+  const [newTodoText, setTodoText] = useState("");
+
   useSubscription(NewTodoSubscription, {
     onSubscriptionData(data) {
       console.log(data);
     },
   });
-
-  // or we can refetch data
-  // const [removeTodo] = useMutation(RemoveTodoMutation, {
-  //   refetchQueries: [
-  //     {
-  //       query: ListTodosQuery,
-  //     },
-  //   ],
-  // });
-  const [newTodoText, setTodoText] = useState("");
 
   if (loading) {
     return <div>loading...</div>;
